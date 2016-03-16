@@ -49,7 +49,8 @@ local function pre_process(msg)
 	end
 
   if is_channel_disabled(receiver) then
-  	msg.text = ""
+  	msg.text = "[#!/]bot on" then
+	    enable_channel(receiver)
   end
 
 	return msg
