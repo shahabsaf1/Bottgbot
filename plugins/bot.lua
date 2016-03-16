@@ -11,22 +11,22 @@ local function is_channel_disabled( receiver )
   return _config.disabled_channels[receiver]
 end
 
-local function enable_channel(receiver, to_id)
+local function enable_channel(receiver)
 	if not _config.disabled_channels then
 		_config.disabled_channels = {}
 	end
 
 	if _config.disabled_channels[receiver] == nil then
-		return lang_text(to_id, 'botOn')..' 😏'
+		return 'Robot is Online'
 	end
 	
 	_config.disabled_channels[receiver] = false
 
 	save_config()
-	return lang_text(to_id, 'botOn')..' 😏'
+	return "Robot is Online"
 end
 
-local function disable_channel(receiver, to_id)
+local function disable_channel( receiver )
 	if not _config.disabled_channels then
 		_config.disabled_channels = {}
 	end
@@ -34,16 +34,17 @@ local function disable_channel(receiver, to_id)
 	_config.disabled_channels[receiver] = true
 
 	save_config()
-	return lang_text(to_id, 'botOff')..' 🚀'
+	return "Robot is Offline"
 end
 
 local function pre_process(msg)
 	local receiver = get_receiver(msg)
 	
-	-- If sender is sudo then re-enable the channel
-	if is_sudo(msg) then
-	  if msg.text == "#bot on" then
-	    enable_channel(receiver, msg.to.id)
+	-- If sender is moderator then re-enable the channel
+	--if is_sudo(msg) then
+	if is_momod(msg) then
+	  if msg.text == "[#!/]bot on" then
+	    enable_channel(receiver)
 	  end
 	end
 
@@ -55,25 +56,27 @@ local function pre_process(msg)
 end
 
 local function run(msg, matches)
-	if permissions(msg.from.id, msg.to.id, "bot") then
-		local receiver = get_receiver(msg)
-		-- Enable a channel
-		if matches[1] == 'on' then
-			return enable_channel(receiver, msg.to.id)
-		end
-		-- Disable a channel
-		if matches[1] == 'off' then
-			return disable_channel(receiver, msg.to.id)
-		end
-	else
-		return '🚫 '..lang_text(msg.to.id, 'require_sudo')
+	local receiver = get_receiver(msg)
+	-- Enable a channel
+	if matches[1] == 'on' then
+		return enable_channel(receiver)
+	end
+	-- Disable a channel
+	if matches[1] == 'off' then
+		return disable_channel(receiver)
 	end
 end
 
 return {
+	description = "Robot Switch", 
+	usage = {
+		"/bot on : enable robot in group",
+		"/bot off : disable robot in group" },
 	patterns = {
-		"^#bot? (on)",
-		"^#bot? (off)" }, 
+		"^[#!/]bot? (on)",
+		"^[#!/]bot? (off)" }, 
 	run = run,
+	privileged = true,
+	--moderated = true,
 	pre_process = pre_process
 }
