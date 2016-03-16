@@ -218,7 +218,6 @@ function create_config( )
        "onservice",
        "poker",
        "spam",
-       "bot",
        "plugins",
        "invite",
        "adder",
