@@ -6,7 +6,7 @@ end
 
 return {
 patterns = {
-"^[Cc]ontact$"
+"^/share$"
 
 },
 run = run
